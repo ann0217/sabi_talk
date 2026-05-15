@@ -683,13 +683,29 @@
                 padding: 40px 20px;
             }
 
-            .phone-mockup {
+            .phone-container {
                 order: -1;
             }
 
             body {
                 overflow-y: auto;
             }
+        }
+
+        /* 출처 표시 스타일 */
+        .phone-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .credit-tag {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
@@ -774,38 +790,42 @@
             </div>
         </div>
 
-        <!-- 중앙 스마트폰 -->
-        <div class="phone-mockup">
-            <div class="phone-btn-l1"></div>
-            <div class="phone-btn-l2"></div>
-            <div class="phone-btn-l3"></div>
-            <div class="phone-mockup-right-btn"></div>
-            <div class="phone-screen">
-                <div class="phone-notch">
-                    <div class="notch-cam-1"></div>
-                    <div class="notch-cam-2"></div>
-                </div>
-                <div class="chat-header-container">
-                    <input type="text" class="chat-title-input" id="chat-title" value="채팅방 타이틀">
-                </div>
-                <div class="chat-body" id="chat-body"></div>
-
-                <div class="chat-input-area">
-                    <div class="sender-controls">
-                        <button class="sender-btn active" id="btn-left-sender" onclick="setSender('left')">A 입력</button>
-                        <button class="sender-btn" id="btn-right-sender" onclick="setSender('right')">B 입력</button>
+        <!-- 중앙 스마트폰 섹션 -->
+        <div class="phone-container">
+            <div class="phone-mockup">
+                <div class="phone-btn-l1"></div>
+                <div class="phone-btn-l2"></div>
+                <div class="phone-btn-l3"></div>
+                <div class="phone-mockup-right-btn"></div>
+                <div class="phone-screen">
+                    <div class="phone-notch">
+                        <div class="notch-cam-1"></div>
+                        <div class="notch-cam-2"></div>
                     </div>
-                    <div class="input-row">
-                        <input type="text" class="chat-input" id="message-input" placeholder="메시지를 입력하세요..."
-                            onkeypress="handleKeyPress(event)">
-                        <button class="send-btn" onclick="sendMessage()">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                            </svg>
-                        </button>
+                    <div class="chat-header-container">
+                        <input type="text" class="chat-title-input" id="chat-title" value="채팅방 타이틀">
+                    </div>
+                    <div class="chat-body" id="chat-body"></div>
+
+                    <div class="chat-input-area">
+                        <div class="sender-controls">
+                            <button class="sender-btn active" id="btn-left-sender" onclick="setSender('left')">A 입력</button>
+                            <button class="sender-btn" id="btn-right-sender" onclick="setSender('right')">B 입력</button>
+                        </div>
+                        <div class="input-row">
+                            <input type="text" class="chat-input" id="message-input" placeholder="메시지를 입력하세요..."
+                                onkeypress="handleKeyPress(event)">
+                            <button class="send-btn" onclick="sendMessage()">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+            <!-- 출처 표시 -->
+            <div class="credit-tag">@4B_1uv</div>
         </div>
 
         <!-- 오른쪽 캐릭터 -->

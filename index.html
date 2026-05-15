@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Messenger</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Do+Hyeon&family=Hahmlet:wght@400;700&family=Gowun+Dodum&family=Jua&display=swap"
+        rel="stylesheet">
+
+    <!-- Cropper.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
+    <style>
+        /* CSS 변수 설정: JS를 통해 테마 색상이 동적으로 변경됨 */
+        :root {
+            --primary-color: #ffb7b2;
+            /* 연분홍 기본 */
+            --bg-color-1: #ffe6eb;
+            --heart-color: #ff85a2;
+            --bubble-right: #ffe5e5;
+
+            --phone-bg: #fdfbfb;
+            --text-main: #5a5a5a;
+            --bubble-left: #ffffff;
+            --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', 'Noto Sans KR', sans-serif;
+            transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+            /* 테마 변경 시 부드러운 전환 */
+        }
+
+        body {
+            background-color: var(--bg-color-1);
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.7) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.7) 2px, transparent 2px);
+            background-size: 35px 35px;
+            background-position: 0 0;
+            background-attachment: fixed;
+            
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            color: var(--text-main);
+            position: relative;
+        }
+
+        /* 메인 컨테이너 */
+        .app-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            width: 100%;
+            max-width: 1300px;
+            padding: 20px;
+            z-index: 10;
+            position: relative;
+        }
+
+        /* 프로필 섹션 */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            width: 300px;
+            position: relative;
+        }
+
+        /* 이름 박스 디자인 (키치한 스티커 스타일) */
+        .name-box {
+            background: #fff;
+            border: 3px solid #111;
+            border-radius: 6px;
+            padding: 8px 25px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #111;
+            box-shadow: 4px 4px 0px var(--primary-color);
+            text-align: center;
+            outline: none;
+            width: 80%;
+        }
+
+        /* 아바타 이미지 (키치 스타일) */
+        .avatar-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background-color: white;
+            padding: 6px;
+            box-shadow: 6px 6px 0px var(--heart-color);
+            cursor: pointer;
+            border: 4px dashed var(--primary-color);
+        }
+
+        .avatar-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #f0f0f0;
+            border: 3px solid #111;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* 해시태그 입력 */
+        .tags-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            text-align: center;
+            font-size: 1.05rem;
+            color: #888;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 5px 20px;
+            width: 100%;
+            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* 대사 입력 */
+        .status-input-container {
+            width: 100%;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quote-mark {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .status-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #555;
+            width: 85%;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.5);
+        }
+
+        /* 휴대폰 목업 (키치 스타일 테두리) */
+        .phone-mockup {
+            width: 375px;
+            height: 750px;
+            background: #111;
+            border-radius: 55px;
+            padding: 14px;
+            box-shadow: 0px 0px 0px 4px #111, 12px 12px 0px var(--primary-color);
+            border: 4px solid #111;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+        }
+
+        .phone-btn-l1 {
+            position: absolute;
+            left: -4px;
+            top: 130px;
+            width: 4px;
+            height: 35px;
+            background: #d0d0d0;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+            box-shadow: inset -1px 0px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .phone-btn-l2 {
+            position: absolute;
+            left: -4px;
+            top: 190px;
+            width: 4px;
+            height: 65px;
+            background: #d0d0d0;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+            box-shadow: inset -1px 0px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .phone-btn-l3 {
+            position: absolute;
+            left: -4px;
+            top: 270px;
+            width: 4px;
+            height: 65px;
+            background: #d0d0d0;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+            box-shadow: inset -1px 0px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .phone-mockup-right-btn {
+            position: absolute;
+            right: -4px;
+            top: 220px;
+            width: 4px;
+            height: 80px;
+            background: #d0d0d0;
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+            box-shadow: inset 1px 0px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: var(--phone-bg);
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 32px;
+            background: #111;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .notch-cam-1 {
+            width: 12px;
+            height: 12px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            box-shadow: inset 0px 0px 4px rgba(255, 255, 255, 0.2);
+            margin-left: 50px;
+        }
+
+        .notch-cam-2 {
+            width: 6px;
+            height: 6px;
+            background: #0d0d0d;
+            border-radius: 50%;
+            box-shadow: inset 0px 0px 2px rgba(255, 255, 255, 0.4);
+            margin-left: 10px;
+        }
+
+        .capture-mode body {
+            background-attachment: initial !important;
+        }
+
+        .capture-mode .app-container {
+            width: fit-content !important;
+            max-width: none !important;
+            padding: 60px !important;
+            background-color: var(--bg-color-1) !important;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.7) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.7) 2px, transparent 2px) !important;
+            background-size: 35px 35px !important;
+            margin: 0 auto !important;
+            display: flex !important;
+        }
+
+        .chat-header-container {
+            padding: 45px 15px 15px;
+            background: rgba(255, 255, 255, 1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 5;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .chat-title-input {
+            background: transparent;
+            border: none;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #444;
+            width: 100%;
+            outline: none;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 20px 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            background: #fdfbfb;
+        }
+
+        .chat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+
+        /* 채팅 메시지 */
+        .message {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 8px;
+            max-width: 85%;
+        }
+
+        .msg-left {
+            align-self: flex-start;
+        }
+
+        .msg-right {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .msg-bubble {
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            box-shadow: 3px 3px 0px #111;
+            border: 2px solid #111;
+            word-wrap: break-word;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .msg-left .msg-bubble {
+            background: var(--bubble-left);
+            border-top-left-radius: 4px;
+        }
+
+        .msg-right .msg-bubble {
+            background: var(--bubble-right);
+            border-top-right-radius: 4px;
+        }
+
+        .msg-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #111;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        /* 입력 영역 */
+        .chat-input-area {
+            background: white;
+            padding: 15px;
+            padding-bottom: 25px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        .chat-input-area::after {
+            content: '';
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 5px;
+            background: #ccc;
+            border-radius: 5px;
+        }
+
+        .sender-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sender-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #111;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #111;
+            font-weight: 800;
+            box-shadow: 2px 2px 0px #111;
+            transition: transform 0.1s;
+        }
+
+        .sender-btn.active {
+            background: var(--primary-color);
+            color: #111;
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px #111;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: 2px solid #111;
+            background: #fff;
+            border-radius: 25px;
+            padding: 12px 18px;
+            outline: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.05);
+        }
+
+        .send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: 2px solid #111;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px #111;
+        }
+
+        .send-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            margin-left: 3px;
+        }
+
+        /* =========================================
+           우측 상단 액션 버튼들 (다운로드, 편집)
+           ========================================= */
+        .action-buttons-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .action-btn {
+            background: white;
+            border: 3px solid #111;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            box-shadow: 4px 4px 0px #111;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #111;
+            transition: transform 0.1s;
+        }
+
+        .action-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #111;
+        }
+
+        .settings-sidebar {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: right 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 30px 25px;
+            overflow-y: auto;
+            color: #333;
+        }
+
+        .settings-sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header h2 {
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .settings-section label {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        /* 컬러 테마 버튼들 */
+        .theme-swatches {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 폰트, 색상 입력 폼 */
+        .settings-sidebar select,
+        .settings-sidebar input[type="color"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            background: #fafafa;
+            margin-bottom: 15px;
+        }
+
+        .settings-sidebar input[type="color"] {
+            height: 50px;
+            padding: 2px;
+        }
+
+        /* 모달 스타일 (Cropper) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 800;
+        }
+
+        .img-container {
+            width: 100%;
+            max-height: 400px;
+            margin-bottom: 20px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .img-container img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-cancel {
+            background: #eee;
+            color: #555;
+        }
+
+        .btn-apply {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                flex-direction: column;
+                gap: 40px;
+                padding: 40px 20px;
+            }
+
+            .phone-mockup {
+                order: -1;
+            }
+
+            body {
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 우측 상단 액션 버튼들 -->
+    <div class="action-buttons-container" id="action-buttons">
+        <!-- 캡처 다운로드 버튼 -->
+        <button class="action-btn" onclick="captureScreen()" title="이미지로 저장">
+            <svg viewBox="0 0 24 24" width="28" height="28">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor" />
+            </svg>
+        </button>
+
+        <!-- 편집 사이드바 토글 버튼 (만년필 아이콘) -->
+        <button class="action-btn" onclick="toggleSidebar()" title="디자인 편집">
+            <svg viewBox="0 0 24 24" width="28" height="28">
+                <path
+                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                    fill="currentColor" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- 사이드바 패널 -->
+    <div class="settings-sidebar" id="settings-sidebar">
+        <div class="sidebar-header">
+            <h2>화면 편집</h2>
+            <button class="close-btn" onclick="toggleSidebar()">✖</button>
+        </div>
+
+        <div class="settings-section">
+            <h3>🎨 Theme Color</h3>
+            <div class="theme-swatches">
+                <button class="theme-btn" style="background: #ffb7b2" onclick="setTheme('pink')" title="연분홍"></button>
+                <button class="theme-btn" style="background: #ffd86f" onclick="setTheme('yellow')" title="연노랑"></button>
+                <button class="theme-btn" style="background: #a2cffe" onclick="setTheme('skyblue')"
+                    title="연하늘"></button>
+                <button class="theme-btn" style="background: #d1c4e9" onclick="setTheme('purple')" title="연보라"></button>
+                <button class="theme-btn" style="background: #b0bec5" onclick="setTheme('gray')" title="회색"></button>
+                <button class="theme-btn" style="background: #ff8a80" onclick="setTheme('red')" title="연붉은색"></button>
+                <button class="theme-btn" style="background: #aed581" onclick="setTheme('green')" title="연두색"></button>
+            </div>
+
+            <label style="margin-top: 20px;">사용자 선택</label>
+            <input type="color" id="custom-theme-color" value="#ffb7b2" onchange="setCustomTheme(this.value)">
+        </div>
+
+        <div class="settings-section">
+            <h3>📝 Title Text</h3>
+            <label>폰트 선택</label>
+            <select id="title-font" onchange="updateTitleStyle()">
+                <option value="'Noto Sans KR', sans-serif">기본 (노토산스)</option>
+                <option value="'Jua', sans-serif">주아체</option>
+                <option value="'Hahmlet', serif">함초롬바탕 (Hahmlet)</option>
+                <option value="'Gowun Dodum', sans-serif">고운돋움</option>
+                <option value="'Do Hyeon', sans-serif">도현체</option>
+            </select>
+
+            <label>글자 색상</label>
+            <input type="color" id="title-color" value="#444444" onchange="updateTitleStyle()">
+        </div>
+    </div>
+
+    <!-- 배경 효과 (CSS 처리됨) -->
+
+    <div class="app-container">
+        <!-- 왼쪽 캐릭터 -->
+        <div class="profile-section">
+            <input type="text" class="name-box" id="left-name" value="A">
+            <div class="avatar-container" onclick="openCropperModal('left')">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'><rect width='300' height='300' fill='%23ffb7b2'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-size='120' fill='%23ffffff'>A</text></svg>"
+                    alt="Left Character" class="avatar-image" id="left-avatar">
+            </div>
+            <input type="file" id="left-file" class="file-input" accept="image/*" onchange="handleFileSelect(event)">
+            <input type="text" class="tags-input" id="left-tags" value="#태그1 #태그2 #태그3">
+            <div class="status-input-container">
+                <span class="quote-mark">"</span>
+                <input type="text" class="status-input" id="left-status" value="한 마디 or 캐프">
+                <span class="quote-mark">"</span>
+            </div>
+        </div>
+
+        <!-- 중앙 스마트폰 -->
+        <div class="phone-mockup">
+            <div class="phone-btn-l1"></div>
+            <div class="phone-btn-l2"></div>
+            <div class="phone-btn-l3"></div>
+            <div class="phone-mockup-right-btn"></div>
+            <div class="phone-screen">
+                <div class="phone-notch">
+                    <div class="notch-cam-1"></div>
+                    <div class="notch-cam-2"></div>
+                </div>
+                <div class="chat-header-container">
+                    <input type="text" class="chat-title-input" id="chat-title" value="채팅방 타이틀">
+                </div>
+                <div class="chat-body" id="chat-body"></div>
+
+                <div class="chat-input-area">
+                    <div class="sender-controls">
+                        <button class="sender-btn active" id="btn-left-sender" onclick="setSender('left')">A 입력</button>
+                        <button class="sender-btn" id="btn-right-sender" onclick="setSender('right')">B 입력</button>
+                    </div>
+                    <div class="input-row">
+                        <input type="text" class="chat-input" id="message-input" placeholder="메시지를 입력하세요..."
+                            onkeypress="handleKeyPress(event)">
+                        <button class="send-btn" onclick="sendMessage()">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽 캐릭터 -->
+        <div class="profile-section">
+            <input type="text" class="name-box" id="right-name" value="B">
+            <div class="avatar-container" onclick="openCropperModal('right')">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'><rect width='300' height='300' fill='%23b5ead7'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-size='120' fill='%23ffffff'>B</text></svg>"
+                    alt="Right Character" class="avatar-image" id="right-avatar">
+            </div>
+            <input type="file" id="right-file" class="file-input" accept="image/*" onchange="handleFileSelect(event)">
+            <input type="text" class="tags-input" id="right-tags" value="#태그1 #태그2 #태그3">
+            <div class="status-input-container">
+                <span class="quote-mark">"</span>
+                <input type="text" class="status-input" id="right-status" value="한 마디 or 캐프">
+                <span class="quote-mark">"</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 크롭 모달 -->
+    <div class="modal-overlay" id="cropper-modal">
+        <div class="modal-content">
+            <h3>프로필 사진 자르기</h3>
+            <div class="img-container">
+                <img id="image-to-crop" src="">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn btn-cancel" onclick="closeCropperModal()">취소</button>
+                <button class="modal-btn btn-apply" onclick="applyCrop()">적용하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // --- 사이드바 및 테마 설정 로직 ---
+        function toggleSidebar() {
+            document.getElementById('settings-sidebar').classList.toggle('open');
+        }
+
+        const themes = {
+            pink: { primary: '#ffb7b2', bg: '#ffe6eb', heart: '#ff85a2', bubbleRight: '#ffe5e5' },
+            yellow: { primary: '#ffd86f', bg: '#fff9e6', heart: '#ffcd38', bubbleRight: '#fff4d1' },
+            skyblue: { primary: '#a2cffe', bg: '#e6f2ff', heart: '#7ab8ff', bubbleRight: '#e6f2ff' },
+            purple: { primary: '#d1c4e9', bg: '#f3e5f5', heart: '#b39ddb', bubbleRight: '#f3e5f5' },
+            gray: { primary: '#b0bec5', bg: '#eceff1', heart: '#90a4ae', bubbleRight: '#eceff1' },
+            red: { primary: '#ff8a80', bg: '#ffebee', heart: '#ff5252', bubbleRight: '#ffebee' },
+            green: { primary: '#aed581', bg: '#f1f8e9', heart: '#8bc34a', bubbleRight: '#f1f8e9' }
+        };
+
+        function setTheme(themeKey) {
+            const theme = themes[themeKey];
+            if (theme) {
+                document.documentElement.style.setProperty('--primary-color', theme.primary);
+                document.documentElement.style.setProperty('--bg-color-1', theme.bg);
+                document.documentElement.style.setProperty('--heart-color', theme.heart);
+                document.documentElement.style.setProperty('--bubble-right', theme.bubbleRight);
+
+                const colorPicker = document.getElementById('custom-theme-color');
+                if (colorPicker) colorPicker.value = theme.primary;
+            }
+        }
+
+        function hexToHSL(H) {
+            let r = 0, g = 0, b = 0;
+            if (H.length == 4) {
+                r = "0x" + H[1] + H[1]; g = "0x" + H[2] + H[2]; b = "0x" + H[3] + H[3];
+            } else if (H.length == 7) {
+                r = "0x" + H[1] + H[2]; g = "0x" + H[3] + H[4]; b = "0x" + H[5] + H[6];
+            }
+            r /= 255; g /= 255; b /= 255;
+            let cmin = Math.min(r, g, b), cmax = Math.max(r, g, b), delta = cmax - cmin, h = 0, s = 0, l = 0;
+
+            if (delta == 0) h = 0;
+            else if (cmax == r) h = ((g - b) / delta) % 6;
+            else if (cmax == g) h = (b - r) / delta + 2;
+            else h = (r - g) / delta + 4;
+
+            h = Math.round(h * 60);
+            if (h < 0) h += 360;
+
+            l = (cmax + cmin) / 2;
+            s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+            s = +(s * 100).toFixed(1);
+            l = +(l * 100).toFixed(1);
+
+            return { h, s, l };
+        }
+
+        function setCustomTheme(hexColor) {
+            const hsl = hexToHSL(hexColor);
+            document.documentElement.style.setProperty('--primary-color', hexColor);
+            document.documentElement.style.setProperty('--bg-color-1', `hsl(${hsl.h}, ${Math.max(hsl.s, 40)}%, 95%)`);
+            document.documentElement.style.setProperty('--heart-color', `hsl(${hsl.h}, ${Math.max(hsl.s, 60)}%, 82%)`);
+            document.documentElement.style.setProperty('--bubble-right', `hsl(${hsl.h}, ${Math.max(hsl.s, 50)}%, 93%)`);
+        }
+
+        function updateTitleStyle() {
+            const titleInput = document.getElementById('chat-title');
+            const font = document.getElementById('title-font').value;
+            const color = document.getElementById('title-color').value;
+            titleInput.style.fontFamily = font;
+            titleInput.style.color = color;
+        }
+        updateTitleStyle();
+
+        // --- 메신저 로직 ---
+        let currentSender = 'left';
+
+        function setSender(sender) {
+            currentSender = sender;
+            document.getElementById('btn-left-sender').classList.remove('active');
+            document.getElementById('btn-right-sender').classList.remove('active');
+            document.getElementById(`btn-${sender}-sender`).classList.add('active');
+            document.getElementById('message-input').focus();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatBody = document.getElementById('chat-body');
+            const messageDiv = document.createElement('div');
+            const avatarSrc = document.getElementById(`${currentSender}-avatar`).src;
+
+            messageDiv.className = `message msg-${currentSender}`;
+            messageDiv.innerHTML = `<img src="${avatarSrc}" class="msg-avatar ${currentSender}-chat-avatar"><div class="msg-bubble">${text}</div>`;
+
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            input.value = ''; input.focus();
+        }
+
+        // --- 크롭 로직 ---
+        let cropper, currentCropTarget = '';
+        function openCropperModal(target) { currentCropTarget = target; document.getElementById(`${target}-file`).click(); }
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('image-to-crop').src = e.target.result;
+                    document.getElementById('cropper-modal').style.display = 'flex';
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(document.getElementById('image-to-crop'), { aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 0.8, center: true, cropBoxMovable: true, cropBoxResizable: true, toggleDragModeOnDblclick: false });
+                }
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
+        }
+        function closeCropperModal() { document.getElementById('cropper-modal').style.display = 'none'; if (cropper) { cropper.destroy(); cropper = null; } }
+        function applyCrop() {
+            if (!cropper) return;
+            const croppedImageDataUrl = cropper.getCroppedCanvas({ width: 300, height: 300 }).toDataURL('image/jpeg');
+            document.getElementById(`${currentCropTarget}-avatar`).src = croppedImageDataUrl;
+            document.querySelectorAll(`.${currentCropTarget}-chat-avatar`).forEach(img => img.src = croppedImageDataUrl);
+            closeCropperModal();
+        }
+
+        // --- 이미지 캡처 로직 ---
+        function captureScreen() {
+            const actionButtons = document.getElementById('action-buttons');
+            const chatInputArea = document.querySelector('.chat-input-area');
+            const sidebar = document.getElementById('settings-sidebar');
+
+            sidebar.classList.remove('open');
+
+            actionButtons.style.display = 'none';
+            chatInputArea.style.display = 'none';
+            
+            // --- PNG 저장 시 텍스트 정렬 및 그림자 누락 해결 ---
+            const inputsToConvert = document.querySelectorAll('.name-box, .tags-input, .status-input, .chat-title-input');
+            const replacements = [];
+
+            inputsToConvert.forEach(input => {
+                const div = document.createElement('div');
+                div.className = input.className;
+                div.innerText = input.value;
+                div.style.cssText = input.style.cssText;
+                
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                div.style.justifyContent = 'center';
+                div.style.boxSizing = 'border-box';
+                div.style.whiteSpace = 'nowrap';
+                div.style.overflow = 'hidden';
+                
+                input.parentNode.insertBefore(div, input);
+                input.style.display = 'none';
+                replacements.push({ input, div });
+            });
+
+            // 캡처 전용 모드 활성화 (background-attachment: fixed 버그 방지)
+            document.body.classList.add('capture-mode');
+
+            // phone-mockup 및 avatar 다중 shadow, var() 이슈 우회를 위한 인라인 스타일 덮어쓰기
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#ffb7b2';
+            const heartColor = getComputedStyle(document.documentElement).getPropertyValue('--heart-color').trim() || '#ff85a2';
+            
+            const originalStyles = [];
+
+            const phoneMockup = document.querySelector('.phone-mockup');
+            if (phoneMockup) {
+                originalStyles.push({ el: phoneMockup, prop: 'boxShadow', val: phoneMockup.style.boxShadow });
+                phoneMockup.style.boxShadow = `0px 0px 0px 4px #111, 12px 12px 0px ${primaryColor}`;
+            }
+
+            const avatars = document.querySelectorAll('.avatar-container');
+            avatars.forEach(avatar => {
+                originalStyles.push({ el: avatar, prop: 'boxShadow', val: avatar.style.boxShadow });
+                originalStyles.push({ el: avatar, prop: 'borderColor', val: avatar.style.borderColor });
+                avatar.style.boxShadow = `6px 6px 0px ${heartColor}`;
+                avatar.style.borderColor = primaryColor;
+            });
+
+            replacements.forEach(({ div }) => {
+                if (div.classList.contains('name-box')) {
+                    div.style.boxShadow = `4px 4px 0px ${primaryColor}`;
+                }
+            });
+
+            // html2canvas 렌더링 오프셋 버그 방지
+            window.scrollTo(0, 0);
+
+            setTimeout(() => {
+                html2canvas(document.querySelector('.app-container'), {
+                    scale: 3,
+                    useCORS: true,
+                    backgroundColor: null
+                }).then(canvas => {
+                    actionButtons.style.display = 'flex';
+                    chatInputArea.style.display = 'flex';
+
+                    // --- 원상 복구 ---
+                    replacements.forEach(({ input, div }) => {
+                        input.style.display = '';
+                        div.remove();
+                    });
+                    originalStyles.forEach(({ el, prop, val }) => {
+                        el.style[prop] = val;
+                    });
+                    document.body.classList.remove('capture-mode');
+
+                    const link = document.createElement('a');
+                    link.download = 'cute_messenger.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    console.error("캡처 실패: ", err);
+                    alert("이미지 저장 중 오류가 발생했습니다: " + err.message);
+                    actionButtons.style.display = 'flex';
+                    chatInputArea.style.display = 'flex';
+
+                    // --- 원상 복구 ---
+                    replacements.forEach(({ input, div }) => {
+                        input.style.display = '';
+                        div.remove();
+                    });
+                    originalStyles.forEach(({ el, prop, val }) => {
+                        el.style[prop] = val;
+                    });
+                    document.body.classList.remove('capture-mode');
+                });
+            }, 300);
+        }
+    </script>
+</body>
+
+</html>
